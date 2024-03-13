@@ -8,8 +8,9 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="company-microservices" />
-        <module name="job-microservices" />
         <module name="Review-microservices" />
+        <module name="service-Registry" />
+        <module name="job-microservices" />
       </profile>
     </annotationProcessing>
   </component>
@@ -18,6 +19,7 @@
       <module name="Review-microservices" options="-parameters" />
       <module name="company-microservices" options="-parameters" />
       <module name="job-microservices" options="-parameters" />
+      <module name="service-Registry" options="-parameters" />
     </option>
   </component>
 </project>

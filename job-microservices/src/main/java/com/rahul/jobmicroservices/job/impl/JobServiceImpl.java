@@ -2,9 +2,12 @@ package com.rahul.jobmicroservices.job.impl;
 
 
 import com.rahul.jobmicroservices.job.*;
+import com.rahul.jobmicroservices.job.external.Company;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +29,11 @@ public class JobServiceImpl implements JobService {
     public List<JobDto> findAll() {
 
         List<Job> jobs = jobRepository.findAll();
+        List<JobWithCompanyDto> jobWithCompanyDtos = new ArrayList<>();
+//        RestTemplate restTemplate = new RestTemplate();
+//
+//        Company company = restTemplate.getForObject("Http://localhost:8081/company/", Company.class);
+
         return jobs.stream().map((job) -> model.map(job,JobDto.class)).collect(Collectors.toList());
     }
 
