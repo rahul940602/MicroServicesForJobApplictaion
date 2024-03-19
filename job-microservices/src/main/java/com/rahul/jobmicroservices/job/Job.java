@@ -19,7 +19,9 @@ public class Job {
 
     private String maxSalary;
     private String location;
+
     private Long companyId;
+
 
     //NoArgConstructor -> jpa needs to create instances of entity class during the retieval of data
    //  from database jpa uses reflections to create instances of entity.

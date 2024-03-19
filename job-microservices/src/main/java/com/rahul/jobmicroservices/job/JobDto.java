@@ -4,6 +4,8 @@ package com.rahul.jobmicroservices.job;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class JobDto {
 
@@ -18,5 +20,8 @@ public class JobDto {
     private String location;
 
     private Long companyId;
+    private CompanyDto companyDto;
+
+    private List<ReviewDto> reviewDto;
 
 }
