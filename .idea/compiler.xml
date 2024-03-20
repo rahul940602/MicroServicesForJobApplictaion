@@ -10,12 +10,14 @@
         <module name="company-microservices" />
         <module name="Review-microservices" />
         <module name="service-Registry" />
+        <module name="ConfigServer" />
         <module name="job-microservices" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="ConfigServer" options="-parameters" />
       <module name="Review-microservices" options="-parameters" />
       <module name="company-microservices" options="-parameters" />
       <module name="job-microservices" options="-parameters" />
