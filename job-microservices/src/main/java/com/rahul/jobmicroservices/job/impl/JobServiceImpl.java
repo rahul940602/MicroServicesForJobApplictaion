@@ -2,6 +2,8 @@ package com.rahul.jobmicroservices.job.impl;
 
 
 import com.rahul.jobmicroservices.job.*;
+import com.rahul.jobmicroservices.job.client.CompanyClient;
+import com.rahul.jobmicroservices.job.client.ReviewClient;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -25,13 +27,20 @@ public class JobServiceImpl implements JobService {
     @Autowired
     private RestTemplate restTemplate;
 
+    private CompanyClient companyClient;
+    private ReviewClient reviewClient;
 
 
 
-    public JobServiceImpl(JobRepository jobRepository,ModelMapper model, RestTemplate restTemplate) {
+
+    public JobServiceImpl(JobRepository jobRepository,ModelMapper model, RestTemplate restTemplate,
+                          CompanyClient companyClient,ReviewClient reviewClient
+    ) {
         this.jobRepository = jobRepository;
         this.model =model;
         this.restTemplate =restTemplate;
+        this.companyClient= companyClient;
+        this.reviewClient = reviewClient;
 
     }
 
@@ -52,19 +61,23 @@ public class JobServiceImpl implements JobService {
 
             // Check if companyId is not null
             if (companyId != null) {
-                CompanyDto companyDto = restTemplate.getForObject(
-                        "http://localhost:8081/company/{id}",
-                        CompanyDto.class,
-                        companyId
+//                CompanyDto companyDto = restTemplate.getForObject(
+//                        "http://localhost:8081/company/{id}",
+//                        CompanyDto.class,
+//                        companyId
+                //                );
+                CompanyDto companyDto = companyClient.getCompanyById(job.getCompanyId());
 
-                );
-                ResponseEntity<List<ReviewDto>> reviewResponse = restTemplate.exchange("http://localhost:8083/reviews?companyId="+
-                        job.getCompanyId(),
-                        HttpMethod.GET,
-                        null,
-                        new ParameterizedTypeReference<List<ReviewDto>>(){
-                        });
-                List<ReviewDto> reviews = reviewResponse.getBody();
+                // Feign Client
+                List<ReviewDto> reviews = reviewClient.getReviews(jobDto.getCompanyId());
+
+//                ResponseEntity<List<ReviewDto>> reviewResponse = restTemplate.exchange("http://localhost:8083/reviews?companyId="+
+//                        job.getCompanyId(),
+//                        HttpMethod.GET,
+//                        null,
+//                        new ParameterizedTypeReference<List<ReviewDto>>(){
+//                        });
+//                List<ReviewDto> reviews = reviewResponse.getBody();
                 jobDto.setCompanyDto(companyDto);
                 jobDto.setReviewDto(reviews);
 
@@ -101,17 +114,26 @@ public class JobServiceImpl implements JobService {
         Job job = jobRepository.findById(id).orElseThrow(()-> new ResourceNotFound("job", "id", id));
         JobDto jobDto = model.map(job,JobDto.class);
 
-        CompanyDto companyDto = restTemplate.getForObject("http://localhost:8081/company/{id}", CompanyDto.class, job.getCompanyId());
+//        Rest Template
+//        CompanyDto companyDto = restTemplate.getForObject("http://localhost:8081/company/{id}", CompanyDto.class, job.getCompanyId());
 
-        ResponseEntity<List<ReviewDto>> reviewResponse = restTemplate.exchange("http://localhost:8083/reviews?companyId="+
-                        job.getCompanyId(),
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<ReviewDto>>(){
-                });
-        List<ReviewDto> reviews = reviewResponse.getBody();
+        //Feign Client
+        CompanyDto companyDto = companyClient.getCompanyById(job.getCompanyId());
+
+        // Rest Template
+//        ResponseEntity<List<ReviewDto>> reviewResponse = restTemplate.exchange("http://localhost:8083/reviews?companyId="+
+//                        job.getCompanyId(),
+//                HttpMethod.GET,
+//                null,
+//                new ParameterizedTypeReference<List<ReviewDto>>(){
+//                });
+//        List<ReviewDto> reviews = reviewResponse.getBody();
+
+        // Feign Client
+        List<ReviewDto> reviews = reviewClient.getReviews(jobDto.getCompanyId());
+
         jobDto.setCompanyDto(companyDto);
-        jobDto.setReviewDto(reviews);
+       jobDto.setReviewDto(reviews);
 
         return jobDto;
     }
