@@ -4,6 +4,9 @@ package com.rahul.jobmicroservices.job.impl;
 import com.rahul.jobmicroservices.job.*;
 import com.rahul.jobmicroservices.job.client.CompanyClient;
 import com.rahul.jobmicroservices.job.client.ReviewClient;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -30,6 +33,8 @@ public class JobServiceImpl implements JobService {
     private CompanyClient companyClient;
     private ReviewClient reviewClient;
 
+    int attempt =0;
+
 
 
 
@@ -44,16 +49,26 @@ public class JobServiceImpl implements JobService {
 
     }
 
-    @Override
+     @Override
+//    @CircuitBreaker(name = "companyBreaker",
+//                      fallbackMethod = "companyBreakerFallback")
+//     @Retry(name = "companyBreaker",
+//                      fallbackMethod = "companyBreakerFallback")
+     @RateLimiter(name = "companyBreaker")
+//             fallbackMethod = "companyBreakerFallback")
+
     public List<JobDto> findAll() {
 
 //        List<Job> jobs = jobRepository.findAll();
 //
 //        JobDto jobDto = model.map(jobs,JobDto.class);
 
+        System.out.println("Attempt : "+ ++attempt);
 
         List<Job> jobs = jobRepository.findAll();
         List<JobDto> jobDtos = new ArrayList<>();
+
+
 
         for (Job job : jobs) {
             JobDto jobDto = model.map(job, JobDto.class);
@@ -81,7 +96,9 @@ public class JobServiceImpl implements JobService {
                 jobDto.setCompanyDto(companyDto);
                 jobDto.setReviewDto(reviews);
 
-            } else {
+            }
+
+            else {
                 // Handle the case where companyId is null
                 System.err.println("Company ID is null for job ID " + job.getId());
             }
@@ -92,6 +109,14 @@ public class JobServiceImpl implements JobService {
         return jobDtos;
 
 
+    }
+
+    //Fallback
+
+    public List<String> companyBreakerFallback(Exception e){
+        List<String> list = new ArrayList<>();
+        list.add("Dummy");
+        return list;
     }
 
     @Override
