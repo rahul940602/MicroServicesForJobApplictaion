@@ -3,6 +3,8 @@ package com.rahul.companymicroservices.company.impl;
 
 
 import com.rahul.companymicroservices.company.*;
+import com.rahul.companymicroservices.company.Dto.CompanyDto;
+import com.rahul.companymicroservices.company.Dto.ReviewDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -66,6 +68,13 @@ public class CompanyServiceImpl implements CompanyService {
                         .orElseThrow(()->new ResourceNotFound("company","id",id));
 
         companyRepository.delete(company);
+
+    }
+
+    @Override
+    public void updateCompanyRating(ReviewDto reviewDto) {
+
+        System.out.println(reviewDto.getDescription());
 
     }
 }

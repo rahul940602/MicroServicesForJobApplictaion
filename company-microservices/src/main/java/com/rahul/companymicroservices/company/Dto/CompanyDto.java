@@ -1,4 +1,4 @@
-package com.rahul.companymicroservices.company;
+package com.rahul.companymicroservices.company.Dto;
 
 
 import lombok.Data;

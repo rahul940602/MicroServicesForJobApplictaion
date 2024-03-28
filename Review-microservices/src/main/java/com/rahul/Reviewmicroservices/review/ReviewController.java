@@ -1,5 +1,6 @@
 package com.rahul.Reviewmicroservices.review;
 
+import com.rahul.Reviewmicroservices.review.messaging.ReviewMessageProducer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +12,13 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final ReviewMessageProducer reviewMessageProducer;
 
-    public ReviewController(ReviewService reviewService) {
+    public ReviewController(ReviewService reviewService,
+                            ReviewMessageProducer reviewMessageProducer) {
+
         this.reviewService = reviewService;
+        this.reviewMessageProducer = reviewMessageProducer;
     }
 
     @GetMapping
@@ -25,7 +30,10 @@ public class ReviewController {
     @PostMapping
     public ResponseEntity<ReviewDto> addReview(@RequestParam Long companyId,
                                                @RequestBody ReviewDto reviewDto){
-        return new ResponseEntity<>(reviewService.addReview(companyId,reviewDto),HttpStatus.OK);
+        ReviewDto addedReview = reviewService.addReview(companyId, reviewDto);
+        reviewMessageProducer.sendMessage(addedReview);
+
+        return new ResponseEntity<>(addedReview,HttpStatus.OK);
     }
 
     @GetMapping("/{reviewId}")

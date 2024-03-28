@@ -1,5 +1,8 @@
 package com.rahul.companymicroservices.company;
 
+import com.rahul.companymicroservices.company.Dto.CompanyDto;
+import com.rahul.companymicroservices.company.Dto.ReviewDto;
+
 import java.util.List;
 
 public interface CompanyService {
@@ -13,4 +16,6 @@ public interface CompanyService {
     CompanyDto updateCompany(CompanyDto companyDto, Long id);
 
     void deleteCompany(Long id);
+
+    public void updateCompanyRating(ReviewDto reviewDto);
 }
